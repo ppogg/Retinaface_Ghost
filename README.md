@@ -245,10 +245,11 @@ MobileNet0.25| Core i5-4210M | 1.7| torch| 640| 187 ms
 MobileNet0.25| Core i5-4210M | 1.7 | onnxruntime| 640| 73 ms
 
    **检测性能对比：**
+
 Backbone | Easy | Medium | Hard
  :-----:|:-----:|:-----:|:----------:|
 resnet50| 95.48% |94.04% | 84.43%| 
-MobileNet v3$^{Se=1}$| 93.48%| 91.23% | 80.19%|
+$MobileNet v3^{Se=1}$| 93.48%| 91.23% | 80.19%|
 $GhostNet-m^{Se=0.25}$| 93.35% |90.84% | 76.11%|
 MobileNet0.25| 90.70% | 88.16%| 73.82%| 
 
