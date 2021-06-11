@@ -4,8 +4,6 @@ A [PyTorch](https://pytorch.org/) implementation of [RetinaFace: Single-stage De
 
 ### 中文详解博客：https://zhuanlan.zhihu.com/p/379730820
 
-<img src="https://img-blog.csdnimg.cn/20210610234801965.jpg" width="700" alt="stream"/><br/>
-
 ### pytorch_retinaface版本跑库测试
 
 retinaface效果如何，只能通过对比实验才能得到验证。这里对pytorch_retinaface版本进行测试，该版本是社区所有版本中star最高的一版。
@@ -53,7 +51,7 @@ python widerface_evaluate/evaluation.py
 ```
 执行完第二条语句后会编译出.so文件，最好在linux系统上进行所有操作：
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2021060920255213.png)
+<img src="https://img-blog.csdnimg.cn/2021060920255213.png" width="700" alt="stream"/><br/>
 
 执行完第三句后，模型会对数据进行批次检测：
 
@@ -61,17 +59,19 @@ python widerface_evaluate/evaluation.py
 
 执行完第三句，评估结果如下：
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609205349121.png)
+<img src="https://img-blog.csdnimg.cn/20210609205349121.png" width="600" alt="stream"/><br/>
 
 **resnet50**
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609211918141.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609212142203.png)
+<img src="https://img-blog.csdnimg.cn/20210609212142203.png" width="600" alt="stream"/><br/>
+
 
 **作者给出的实验结果：**
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609204525520.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+<img src="https://img-blog.csdnimg.cn/20210609204525520.png" width="450" alt="stream"/><br/>
+
 
 ### GhostNet和MobileNetv3移植骨架
 
@@ -80,48 +80,7 @@ python widerface_evaluate/evaluation.py
 上节测试后，又拿了一张只包含一张人脸的图片进行检测，可以发现，resnet50对于检测单张图片且图片仅含单张人脸耗时比较久，如果项目注重实时性的话mb0.25是个更好的选择，但对于人脸密集且尺度较小的场景就显得比较吃力。
 倘若骨架替换成其他网络，是否能兼顾实时性和精度？
 这里的骨架替换暂时使用ghostnet和mobilev3网络（主要也想测试下这两个网络的效果是否能像论文一样出众）。
-我们在config.py文件中添置这两个网络的相关参数信息：
 
-```
-cfg_gnet = {
-    'name': 'ghostnet',
-    'min_sizes': [[16, 32], [64, 128], [256, 512]],
-    'steps': [8, 16, 32],
-    'variance': [0.1, 0.2],
-    'clip': True,
-    'loc_weight': 2.0,
-    'gpu_train': True,
-    'batch_size': 16,
-    'ngpu': 1,
-    'epoch': 300,
-    'decay1': 190,
-    'decay2': 220,
-    'image_size': 640,
-    'pretrain': False,
-    'return_layers': {'blocks1': 1, 'blocks2': 2, 'blocks3': 3},
-    'in_channel': 32,
-    'out_channel': 64
-}
-cfg_mnetv3 = {
-    'name': 'mobilev3',
-    'min_sizes': [[16, 32], [64, 128], [256, 512]],
-    'steps': [8, 16, 32],
-    'variance': [0.1, 0.2],
-    'clip': True,
-    'loc_weight': 2.0,
-    'gpu_train': True,
-    'batch_size': 16,
-    'ngpu': 1,
-    'epoch': 350,
-    'decay1': 190,
-    'decay2': 220,
-    'image_size': 680,
-    'pretrain': False,
-    'return_layers': {'bneck1': 1, 'bneck2': 2, 'bneck3': 3},
-    'in_channel': 32,
-    'out_channel': 64
-}
-```
 我们在retinaface.py文件的父类指定相关引用，并在IntermediateLayerGetter(backbone, cfg['return_layers'])指定需要调用的网络层ID，该ID在config.py文件中已经指明：
 
 ```
@@ -167,20 +126,23 @@ in_channels_stage2 = cfg['in_channel']
         # self.FPN = FPN(in_channels_list, out_channels)
         self.FPN = FPN(in_channels_list, out_channels)
 ```
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610212941398.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+<img src="https://img-blog.csdnimg.cn/20210610212941398.png" width="450" alt="stream"/><br/>
+
 以mobile0.25为例，从下往上的in_channels分别为64,128,256（在config.py定义的初始  `'in_channel': 32,`分别*2，*4，*8依次类推）
 
 我们在models/ghostnet.py中插入ghontnet网络，网络结构来源于诺亚方舟实验室开源地址[https://github.com/huawei-noah/ghostnet](https://github.com/huawei-noah/ghostnet)：
 
 **轻量级网络分类效果对比：**
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610215038358.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+
+<img src="https://img-blog.csdnimg.cn/20210610215038358.png" width="600" alt="stream"/><br/>
 
 因为包含残差卷积分离模块和SE模块，源码相对较长，修改后的网络源码如下：`models/ghostnet.py`
 
 我们在models/mobilev3.py中插入MobileNetv3网络，网络结构来源于github网友复现的pytorch版本，真即插即用！[https://github.com/kuan-wang/pytorch-mobilenet-v3](https://github.com/kuan-wang/pytorch-mobilenet-v3)：
 
 分类效果：
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610220000740.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+
+<img src="https://img-blog.csdnimg.cn/20210610220000740.png" width="400" alt="stream"/><br/>
 
 修改后的源码如下：`models/mobilenetv3.py`
 
@@ -188,7 +150,7 @@ in_channels_stage2 = cfg['in_channel']
 
 执行命令：`nohup python train.py --network ghostnet > ghostnet.log 2>&1 &`开始训练
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610221938138.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+<img src="https://img-blog.csdnimg.cn/20210610221938138.png" width="600" alt="stream"/><br/>
 
 统计每个网络训练单个epoch的时长：
 
@@ -247,7 +209,6 @@ MobileNet0.25| Core i5-4210M | 1.7| torch| 640| 187 ms
 MobileNet0.25| Core i5-4210M | 1.7 | onnxruntime| 640| 73 ms
 
    **检测性能对比：**
-
 Backbone | Easy | Medium | Hard
  :-----:|:-----:|:-----:|:----------:|
 resnet50| 95.48% |94.04% | 84.43%| 
@@ -271,4 +232,3 @@ title={RetinaFace: Single-stage Dense Face Localisation in the Wild},
 author={Deng, Jiankang and Guo, Jia and Yuxiang, Zhou and Jinke Yu and Irene Kotsia and Zafeiriou, Stefanos},
 booktitle={arxiv},
 year={2019}
-```
