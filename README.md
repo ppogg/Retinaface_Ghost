@@ -4,6 +4,8 @@ A [PyTorch](https://pytorch.org/) implementation of [RetinaFace: Single-stage De
 
 ### 中文详解博客：https://zhuanlan.zhihu.com/p/379730820
 
+<img src="https://pic1.zhimg.com/80/v2-84f20d3419063adf10bc001f8ae92a1c_720w.jpg" width="600" alt="stream"/><br/>
+
 ### pytorch_retinaface版本跑库测试
 
 retinaface效果如何，只能通过对比实验才能得到验证。这里对pytorch_retinaface版本进行测试，该版本是社区所有版本中star最高的一版。
@@ -218,7 +220,7 @@ MobileNet0.25| 90.70% | 88.16%| 73.82%|
 
    **单图测试效果对比：**
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610234801965.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+<img src="https://pic1.zhimg.com/80/v2-84f20d3419063adf10bc001f8ae92a1c_720w.jpg" width="600" alt="stream"/><br/>
 
 ### 中文详解博客：https://zhuanlan.zhihu.com/p/379730820
 
