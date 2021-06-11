@@ -9,10 +9,13 @@ retinaface效果如何，只能通过对比实验才能得到验证。这里对p
 #### 数据集准备
 该地址包含干净的Wideface数据集：[https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB](https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB)
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609195709924.png)
+
 下载后的数据集一共包含这三个：
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609200347763.png)
+
 此时的文件夹是只有图片的，然而作者要求的数据格式是：
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609200458806.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+
 所以我们还少了数据的索引文件，这时候要使用作者提供的脚本`wider_val.py`，将图片信息导出成txt文件：
 
 ```
@@ -50,6 +53,7 @@ if __name__ == '__main__':
 ```
 导出后的完整格式如下：
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609200838123.png)
+
 每份数据集都有一份包含样本信息的txt文件
 txt文件内容大致是这样（以train.txt为例），包含图片信息和人脸位置信息：
 ```
@@ -76,13 +80,16 @@ python widerface_evaluate/evaluation.py
 ```
 执行完第二条语句后会编译出.so文件，最好在linux系统上进行所有操作：
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/2021060920255213.png)
+
 执行完第三句后，模型会对数据进行批次检测：
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609203935302.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
 执行完第三句，评估结果如下：
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609205349121.png)
+
 **resnet50**
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609211918141.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609212142203.png)
+
 **作者给出的实验结果：**
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609204525520.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
 
@@ -215,16 +222,20 @@ in_channels_stage2 = cfg['in_channel']
 
 **轻量级网络分类效果对比：**
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610215038358.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+
 检测效果对比：
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610215128973.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+
 因为包含残差卷积分离模块和SE模块，源码相对较长，修改后的网络源码如下：
 `models/ghostnet.py`
 我们在models/mobilev3.py中插入MobileNetv3网络，网络结构来源于github网友复现的pytorch版本，真即插即用！[https://github.com/kuan-wang/pytorch-mobilenet-v3](https://github.com/kuan-wang/pytorch-mobilenet-v3)：
 
 分类效果：
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610220000740.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+
 检测效果：
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610220052833.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+
 修改后的源码如下：
 `models/mobilenetv3.py`
 
@@ -238,12 +249,14 @@ in_channels_stage2 = cfg['in_channel']
 #### 3.2 模型测试与评估
 评估的具体步骤在上节已经讲过，这里不再累述
 
-**测试ghostnet-m（se-ratio=0.25）：**
+**测试ghostnet（se-ratio=0.25）：**
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610222641388.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+
 可以看出，一份batch的测试大概在76ms左右
 
-**评估ghostnet-m（se-ratio=0.25）：**
+**评估ghostnet(se-ratio=0.25）：**
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610222836784.png)
+
 可以看出，ghostnet对小样本数据和人脸遮挡的情况识别相对较差。
 
 **测试MobileNetV3（se-ratio=1）：**
