@@ -2,124 +2,287 @@
 
 A [PyTorch](https://pytorch.org/) implementation of [RetinaFace: Single-stage Dense Face Localisation in the Wild](https://arxiv.org/abs/1905.00641). Model size only 1.7M, when Retinaface use mobilenet0.25 as backbone net. We also provide resnet50 as backbone net to get better result. The official code in Mxnet can be found [here](https://github.com/deepinsight/insightface/tree/master/RetinaFace).
 
-## Mobile or Edge device deploy
-We also provide a set of Face Detector for edge device in [here](https://github.com/biubug6/Face-Detector-1MB-with-landmark) from python training to C++ inference.
+### 中文详解博客：https://zhuanlan.zhihu.com/p/379730820
 
-## WiderFace Val Performance in single scale When using Resnet50 as backbone net.
-| Style | easy | medium | hard |
-|:-|:-:|:-:|:-:|
-| Pytorch (same parameter with Mxnet) | 94.82 % | 93.84% | 89.60% |
-| Pytorch (original image scale) | 95.48% | 94.04% | 84.43% |
-| Mxnet | 94.86% | 93.87% | 88.33% |
-| Mxnet(original image scale) | 94.97% | 93.89% | 82.27% |
+### pytorch_retinaface版本跑库测试
+retinaface效果如何，只能通过对比实验才能得到验证。这里对pytorch_retinaface版本进行测试，该版本是社区所有版本中star最高的一版。
+#### 数据集准备
+该地址包含干净的Wideface数据集：[https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB](https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609195709924.png)
+下载后的数据集一共包含这三个：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609200347763.png)
+此时的文件夹是只有图片的，然而作者要求的数据格式是：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609200458806.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+所以我们还少了数据的索引文件，这时候要使用作者提供的脚本`wider_val.py`，将图片信息导出成txt文件：
 
-## WiderFace Val Performance in single scale When using Mobilenet0.25 as backbone net.
-| Style | easy | medium | hard |
-|:-|:-:|:-:|:-:|
-| Pytorch (same parameter with Mxnet) | 88.67% | 87.09% | 80.99% |
-| Pytorch (original image scale) | 90.70% | 88.16% | 73.82% |
-| Mxnet | 88.72% | 86.97% | 79.19% |
-| Mxnet(original image scale) | 89.58% | 87.11% | 69.12% |
-<p align="center"><img src="curve/Widerface.jpg" width="640"\></p>
-
-## FDDB Performance.
-| FDDB(pytorch) | performance |
-|:-|:-:|
-| Mobilenet0.25 | 98.64% |
-| Resnet50 | 99.22% |
-<p align="center"><img src="curve/FDDB.png" width="640"\></p>
-
-### Contents
-- [Installation](#installation)
-- [Training](#training)
-- [Evaluation](#evaluation)
-- [TensorRT](#tensorrt)
-- [References](#references)
-
-## Installation
-##### Clone and install
-1. git clone https://github.com/biubug6/Pytorch_Retinaface.git
-
-2. Pytorch version 1.1.0+ and torchvision 0.3.0+ are needed.
-
-3. Codes are based on Python 3
-
-##### Data
-1. Download the [WIDERFACE](http://shuoyang1213.me/WIDERFACE/WiderFace_Results.html) dataset.
-
-2. Download annotations (face bounding boxes & five facial landmarks) from [baidu cloud](https://pan.baidu.com/s/1Laby0EctfuJGgGMgRRgykA) or [dropbox](https://www.dropbox.com/s/7j70r3eeepe4r2g/retinaface_gt_v1.1.zip?dl=0)
-
-3. Organise the dataset directory as follows:
-
-```Shell
-  ./data/widerface/
-    train/
-      images/
-      label.txt
-    val/
-      images/
-      wider_val.txt
 ```
-ps: wider_val.txt only include val file names but not label information.
+# -*- coding: UTF-8 -*-
+'''
+@author: mengting gu
+@contact: 1065504814@qq.com
+@time: 2020/11/2 上午11:47
+@file: widerValFile.py
+@desc:
+'''
+import os
+import argparse
 
-##### Data1
-We also provide the organized dataset we used as in the above directory structure.
+parser = argparse.ArgumentParser(description='Retinaface')
+parser.add_argument('--dataset_folder', default=r'E:\pytorch\Retinaface\data\widerface\WIDER_val\images/', type=str, help='dataset path')
+args = parser.parse_args()
 
-Link: from [google cloud](https://drive.google.com/open?id=11UGV3nbVv1x9IC--_tK3Uxf7hA6rlbsS) or [baidu cloud](https://pan.baidu.com/s/1jIp9t30oYivrAvrgUgIoLQ) Password: ruck
+if __name__ == '__main__':
+    # testing dataset
+    testset_folder = args.dataset_folder
+    testset_list = args.dataset_folder[:-7] + "label.txt"
 
-## Training
-We provide restnet50 and mobilenet0.25 as backbone network to train model.
-We trained Mobilenet0.25 on imagenet dataset and get 46.58%  in top 1. If you do not wish to train the model, we also provide trained model. Pretrain model  and trained model are put in [google cloud](https://drive.google.com/open?id=1oZRSG0ZegbVkVwUd8wUIQx8W7yfZ_ki1) and [baidu cloud](https://pan.baidu.com/s/12h97Fy1RYuqMMIV-RpzdPg) Password: fstq . The model could be put as follows:
-```Shell
-  ./weights/
-      mobilenet0.25_Final.pth
-      mobilenetV1X0.25_pretrain.tar
-      Resnet50_Final.pth
+    with open(testset_list, 'r') as fr:
+        test_dataset = fr.read().split()
+    num_images = len(test_dataset)
+
+    for i, img_name in enumerate(test_dataset):
+        print("line i :{}".format(i))
+        if img_name.endswith('.jpg'):
+            print("     img_name :{}".format(img_name))
+            f = open(args.dataset_folder[:-7] + 'wider_val.txt', 'a')
+            f.write(img_name + '\n')
+    f.close()
 ```
-1. Before training, you can check network configuration (e.g. batch_size, min_sizes and steps etc..) in ``data/config.py and train.py``.
-
-2. Train the model using WIDER FACE:
-  ```Shell
-  CUDA_VISIBLE_DEVICES=0,1,2,3 python train.py --network resnet50 or
-  CUDA_VISIBLE_DEVICES=0 python train.py --network mobile0.25
-  ```
-
-
-## Evaluation
-### Evaluation widerface val
-1. Generate txt file
-```Shell
-python test_widerface.py --trained_model weight_file --network mobile0.25 or resnet50
+导出后的完整格式如下：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609200838123.png)
+每份数据集都有一份包含样本信息的txt文件
+txt文件内容大致是这样（以train.txt为例），包含图片信息和人脸位置信息：
 ```
-2. Evaluate txt results. Demo come from [Here](https://github.com/wondervictor/WiderFace-Evaluation)
-```Shell
+# 0--Parade/0_Parade_marchingband_1_849.jpg
+449 330 122 149 488.906 373.643 0.0 542.089 376.442 0.0 515.031 412.83 0.0 485.174 425.893 0.0 538.357 431.491 0.0 0.82
+# 0--Parade/0_Parade_Parade_0_904.jpg
+361 98 263 339 424.143 251.656 0.0 547.134 232.571 0.0 494.121 325.875 0.0 453.83 368.286 0.0 561.978 342.839 0.0 0.89
+```
+
+#### 模型训练
+
+```
+python train.py --network mobile0.25 
+```
+如有需要，请先下载预训练模型，放在weights文件夹中。如果想从头开始训练，则在data/config.py文件中指定`'pretrain': False,`
+
+#### 模型评估
+**mobile0.25**
+```
 cd ./widerface_evaluate
 python setup.py build_ext --inplace
-python evaluation.py
+python test_widerface.py --trained_model ./weights/mobilenet0.25_Final.pth --network mobile0.25
+python widerface_evaluate/evaluation.py
 ```
-3. You can also use widerface official Matlab evaluate demo in [Here](http://mmlab.ie.cuhk.edu.hk/projects/WIDERFace/WiderFace_Results.html)
-### Evaluation FDDB
+执行完第二条语句后会编译出.so文件，最好在linux系统上进行所有操作：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2021060920255213.png)
+执行完第三句后，模型会对数据进行批次检测：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609203935302.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+执行完第三句，评估结果如下：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609205349121.png)
+**resnet50**
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609211918141.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609212142203.png)
+**作者给出的实验结果：**
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609204525520.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
 
-1. Download the images [FDDB](https://drive.google.com/open?id=17t4WULUDgZgiSy5kpCax4aooyPaz3GQH) to:
-```Shell
-./data/FDDB/images/
+### GhostNet和MobileNetv3移植骨架
+
+#### 3.1 pytorch_retinaface源码修改
+上节测试后，又拿了一张只包含一张人脸的图片进行检测，可以发现，resnet50对于检测单张图片且图片仅含单张人脸耗时比较久，如果项目注重实时性的话mb0.25是个更好的选择，但对于人脸密集且尺度较小的场景就显得比较吃力。
+倘若骨架替换成其他网络，是否能兼顾实时性和精度？
+这里的骨架替换暂时使用ghostnet和mobilev3网络（主要也想测试下这两个网络的效果是否能像论文一样出众）。
+我们在config.py文件中添置这两个网络的相关参数信息：
+
 ```
-
-2. Evaluate the trained model using:
-```Shell
-python test_fddb.py --trained_model weight_file --network mobile0.25 or resnet50
+cfg_gnet = {
+    'name': 'ghostnet',
+    'min_sizes': [[16, 32], [64, 128], [256, 512]],
+    'steps': [8, 16, 32],
+    'variance': [0.1, 0.2],
+    'clip': True,
+    'loc_weight': 2.0,
+    'gpu_train': True,
+    'batch_size': 16,
+    'ngpu': 1,
+    'epoch': 300,
+    'decay1': 190,
+    'decay2': 220,
+    'image_size': 640,
+    'pretrain': False,
+    'return_layers': {'blocks1': 1, 'blocks2': 2, 'blocks3': 3},
+    'in_channel': 32,
+    'out_channel': 64
+}
+cfg_mnetv3 = {
+    'name': 'mobilev3',
+    'min_sizes': [[16, 32], [64, 128], [256, 512]],
+    'steps': [8, 16, 32],
+    'variance': [0.1, 0.2],
+    'clip': True,
+    'loc_weight': 2.0,
+    'gpu_train': True,
+    'batch_size': 16,
+    'ngpu': 1,
+    'epoch': 350,
+    'decay1': 190,
+    'decay2': 220,
+    'image_size': 680,
+    'pretrain': False,
+    'return_layers': {'bneck1': 1, 'bneck2': 2, 'bneck3': 3},
+    'in_channel': 32,
+    'out_channel': 64
+}
 ```
+我们在retinaface.py文件的父类指定相关引用，并在IntermediateLayerGetter(backbone, cfg['return_layers'])指定需要调用的网络层ID，该ID在config.py文件中已经指明：
 
-3. Download [eval_tool](https://bitbucket.org/marcopede/face-eval) to evaluate the performance.
+```
+def __init__(self, cfg=None, phase='train'):
+    """
+    :param cfg:  Network related settings.
+    :param phase: train or test.
+    """
+    super(RetinaFace, self).__init__()
+    self.phase = phase
+    backbone = None
+    if cfg['name'] == 'mobilenet0.25':
+        backbone = MobileNetV1()
+        if cfg['pretrain']:
+            checkpoint = torch.load("./weights/mobilenetV1X0.25_pretrain.tar", map_location=torch.device('cpu'))
+            from collections import OrderedDict
+            new_state_dict = OrderedDict()
+            for k, v in checkpoint['state_dict'].items():
+                name = k[7:]  # remove module.
+                new_state_dict[name] = v
+            # load params
+            backbone.load_state_dict(new_state_dict)
+    elif cfg['name'] == 'Resnet50':
+        import torchvision.models as models
+        backbone = models.resnet50(pretrained=cfg['pretrain'])
+    elif cfg['name'] == 'ghostnet':
+        backbone = ghostnet()
+    elif cfg['name'] == 'mobilev3':
+        backbone = MobileNetV3()
 
-<p align="center"><img src="curve/1.jpg" width="640"\></p>
+    self.body = _utils.IntermediateLayerGetter(backbone, cfg['return_layers'])
+```
+我们指定FPN的网络通道数，并为模型中制定的三层FPN结构固定每一层的`in_channels`：
 
-## TensorRT
--[TensorRT](https://github.com/wang-xinyu/tensorrtx/tree/master/retinaface)
+```
+in_channels_stage2 = cfg['in_channel']
+        in_channels_list = [
+            in_channels_stage2 * 2,
+            in_channels_stage2 * 4,
+            in_channels_stage2 * 8,
+        ]
+        out_channels = cfg['out_channel']
+        # self.FPN = FPN(in_channels_list, out_channels)
+        self.FPN = FPN(in_channels_list, out_channels)
+```
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610212941398.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+以mobile0.25为例，从下往上的in_channels分别为64,128,256（在config.py定义的初始  `'in_channel': 32,`分别*2，*4，*8依次类推）
+
+正如论文所说的，pytorch版本定义了SSH的三层结构，并将FPN迭代的结果封装成三组Tensor，分别代入计算。得出三组features，再合并成一类大组。
+
+		"""
+		retinaface.py → line 91 - line 97
+		"""
+        self.ssh1 = SSH(out_channels, out_channels)
+        self.ssh2 = SSH(out_channels, out_channels)
+        self.ssh3 = SSH(out_channels, out_channels)
+
+        self.ClassHead = self._make_class_head(fpn_num=3, inchannels=cfg['out_channel'])
+        self.BboxHead = self._make_bbox_head(fpn_num=3, inchannels=cfg['out_channel'])
+        self.LandmarkHead = self._make_landmark_head(fpn_num=3, inchannels=cfg['out_channel'])
+
+		"""
+		retinaface.py → line 123 - line 133
+		"""
+		fpn = self.FPN(out)
+
+        # SSH
+        feature1 = self.ssh1(fpn[0])
+        feature2 = self.ssh2(fpn[1])
+        feature3 = self.ssh3(fpn[2])
+        features = [feature1, feature2, feature3]
+
+        bbox_regressions = torch.cat([self.BboxHead[i](feature) for i, feature in enumerate(features)], dim=1)
+        classifications = torch.cat([self.ClassHead[i](feature) for i, feature in enumerate(features)], dim=1)
+        ldm_regressions = torch.cat([self.LandmarkHead[i](feature) for i, feature in enumerate(features)], dim=1)
+
+
+我们在models/ghostnet.py中插入ghontnet网络，网络结构来源于诺亚方舟实验室开源地址[https://github.com/huawei-noah/ghostnet](https://github.com/huawei-noah/ghostnet)：
+
+**轻量级网络分类效果对比：**
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610215038358.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+检测效果对比：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610215128973.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+因为包含残差卷积分离模块和SE模块，源码相对较长，修改后的网络源码如下：
+`models/ghostnet.py`
+我们在models/mobilev3.py中插入MobileNetv3网络，网络结构来源于github网友复现的pytorch版本，真即插即用！[https://github.com/kuan-wang/pytorch-mobilenet-v3](https://github.com/kuan-wang/pytorch-mobilenet-v3)：
+
+分类效果：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610220000740.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+检测效果：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610220052833.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+修改后的源码如下：
+`models/mobilenetv3.py`
+
+#### 3.2 模型训练
+执行命令：`nohup python train.py --network ghostnet > ghostnet.log 2>&1 &`开始训练
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610221938138.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+统计每个网络训练单个epoch的时长：
+
+ - **resnet50>>mobilenetv3>ghostnet-m>ghostnet-s>mobilenet0.25**
+
+#### 3.2 模型测试与评估
+评估的具体步骤在上节已经讲过，这里不再累述
+
+**测试ghostnet-m（se-ratio=0.25）：**
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610222641388.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+可以看出，一份batch的测试大概在76ms左右
+
+**评估ghostnet-m（se-ratio=0.25）：**
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610222836784.png)
+可以看出，ghostnet对小样本数据和人脸遮挡的情况识别相对较差。
+
+**测试MobileNetV3（se-ratio=1）：**
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610223025905.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)可以看出，一份batch的测试大概在120ms左右
+
+**评估MobileNetV3（se-ratio=1）：**
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610223123787.png)
+**这里的评估效果在三份子集上均优于ghostnet（这里的比对其实是有点不科学的，因为是用的mbv3的se_ratio全开对标ghostnet的se_ratio开1/4，但ghostnet的se_ratio全开会导致模型内存暴涨的情况（se-ratio=0时weights=6M，se-ratio=0.25时weights=12M，se-ratio=1时weights=30M，且精度勉强超过se-ratio=1的MobileNetV3，个人感觉性价比过低））**
+
+#### 3.2 resnet & mbv3 & gnet & mb0.25对比测试
+   **推理性能对比：**
+   
+Backbone | Computing backend | size（MB） | Framework | input_size| Run time
+ :-----:|:-----:|:-----:|:----------:|:----:|:----:|
+resnet50| Core i5-4210M |106 | torch| 640| 1571 ms
+$GhostNet-m^{Se=0.25}$| Core i5-4210M |12 | torch| 640| 403 ms
+MobileNet v3| Core i5-4210M | 8 | torch| 640| 576 ms
+MobileNet0.25| Core i5-4210M | 1.7| torch| 640| 187 ms
+MobileNet0.25| Core i5-4210M | 1.7 | onnxruntime| 640| 73 ms
+
+   **检测性能对比：**
+Backbone | Easy | Medium | Hard
+ :-----:|:-----:|:-----:|:----------:|
+resnet50| 95.48% |94.04% | 84.43%| 
+MobileNet v3$^{Se=1}$| 93.48%| 91.23% | 80.19%|
+$GhostNet-m^{Se=0.25}$| 93.35% |90.84% | 76.11%|
+MobileNet0.25| 90.70% | 88.16%| 73.82%| 
+
+   **单图测试效果对比：**
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610234801965.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
+
+### 中文详解博客：https://zhuanlan.zhihu.com/p/379730820
 
 ## References
 - [FaceBoxes](https://github.com/zisianw/FaceBoxes.PyTorch)
 - [Retinaface (mxnet)](https://github.com/deepinsight/insightface/tree/master/RetinaFace)
+- [biubug6/Pytorch_Retinaface](https://github.com/biubug6/Pytorch_Retinaface)
 ```
 @inproceedings{deng2019retinaface,
 title={RetinaFace: Single-stage Dense Face Localisation in the Wild},
