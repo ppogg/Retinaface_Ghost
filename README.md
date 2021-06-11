@@ -4,7 +4,7 @@ A [PyTorch](https://pytorch.org/) implementation of [RetinaFace: Single-stage De
 
 ### 中文详解博客：https://zhuanlan.zhihu.com/p/379730820
 
-<img src="https://img-blog.csdnimg.cn/20210610234801965.jpg" width="700" height="600" alt="stream"/><br/>
+<img src="https://img-blog.csdnimg.cn/20210610234801965.jpg" width="700" alt="stream"/><br/>
 
 ### pytorch_retinaface版本跑库测试
 
