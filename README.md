@@ -44,24 +44,12 @@ python train.py --network mobile0.25
 
 #### 模型评估
 
-**mobile0.25**
 ```
 cd ./widerface_evaluate
 python setup.py build_ext --inplace
 python test_widerface.py --trained_model ./weights/mobilenet0.25_Final.pth --network mobile0.25
 python widerface_evaluate/evaluation.py
 ```
-执行完第二条语句后会编译出.so文件，最好在linux系统上进行所有操作：
-
-<img src="https://img-blog.csdnimg.cn/2021060920255213.png" width="700" alt="stream"/><br/>
-
-执行完第三句后，模型会对数据进行批次检测：
-
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609203935302.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
-
-执行完第三句，评估结果如下：
-
-<img src="https://img-blog.csdnimg.cn/20210609205349121.png" width="600" alt="stream"/><br/>
 
 ### GhostNet和MobileNetv3移植骨架
 
