@@ -63,18 +63,6 @@ python widerface_evaluate/evaluation.py
 
 <img src="https://img-blog.csdnimg.cn/20210609205349121.png" width="600" alt="stream"/><br/>
 
-**resnet50**
-
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609211918141.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
-
-<img src="https://img-blog.csdnimg.cn/20210609212142203.png" width="600" alt="stream"/><br/>
-
-
-**作者给出的实验结果：**
-
-<img src="https://img-blog.csdnimg.cn/20210609204525520.png" width="450" alt="stream"/><br/>
-
-
 ### GhostNet和MobileNetv3移植骨架
 
 #### 3.1 pytorch_retinaface源码修改
