@@ -129,8 +129,6 @@ in_channels_stage2 = cfg['in_channel']
 
 #### 3.3 模型测试与评估
 
-评估的具体步骤在上节已经讲过，这里不再累述
-
 **测试ghostnet（se-ratio=0.25）：**
 
 ![](https://pic1.zhimg.com/80/v2-85514cc55ce31b937d4fdf85fbbf7670_720w.jpg)
