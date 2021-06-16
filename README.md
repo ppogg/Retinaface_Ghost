@@ -119,7 +119,7 @@ in_channels_stage2 = cfg['in_channel']
 
 #### 3.2 模型训练
 
-执行命令：`nohup python train.py --network ghostnet > ghostnet.log 2>&1 &`开始训练
+执行命令：`python train.py --network ghostnet`开始训练
 
 <img src="https://img-blog.csdnimg.cn/20210610221938138.png" width="600" alt="stream"/><br/>
 
