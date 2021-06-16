@@ -1,12 +1,10 @@
 # RetinaFace in PyTorch
 
-A [PyTorch](https://pytorch.org/) implementation of [RetinaFace: Single-stage Dense Face Localisation in the Wild](https://arxiv.org/abs/1905.00641). Model size only 1.7M, when Retinaface use mobilenet0.25 as backbone net. We also provide resnet50 as backbone net to get better result. The official code in Mxnet can be found [here](https://github.com/deepinsight/insightface/tree/master/RetinaFace).
-
 ### 中文详解博客：https://zhuanlan.zhihu.com/p/379730820
 
 <img src="https://pic1.zhimg.com/80/v2-84f20d3419063adf10bc001f8ae92a1c_720w.jpg" width="600" alt="stream"/><br/>
 
-### pytorch_retinaface版本跑库测试
+## pytorch_retinaface版本跑库测试
 
 retinaface效果如何，只能通过对比实验才能得到验证。这里对pytorch_retinaface版本进行测试，该版本是社区所有版本中star最高的一版。
 
@@ -51,7 +49,7 @@ python test_widerface.py --trained_model ./weights/mobilenet0.25_Final.pth --net
 python widerface_evaluate/evaluation.py
 ```
 
-### GhostNet和MobileNetv3移植骨架
+## GhostNet和MobileNetv3移植骨架
 
 #### 3.1 pytorch_retinaface源码修改
 
