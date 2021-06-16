@@ -115,10 +115,6 @@ in_channels_stage2 = cfg['in_channel']
 
 我们在models/mobilev3.py中插入MobileNetv3网络，网络结构来源于github网友复现的pytorch版本，真即插即用！[https://github.com/kuan-wang/pytorch-mobilenet-v3](https://github.com/kuan-wang/pytorch-mobilenet-v3)：
 
-分类效果：
-
-<img src="https://img-blog.csdnimg.cn/20210610220000740.png" width="400" alt="stream"/><br/>
-
 修改后的源码如下：`models/mobilenetv3.py`
 
 #### 3.2 模型训练
