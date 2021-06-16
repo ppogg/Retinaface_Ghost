@@ -104,9 +104,6 @@ in_channels_stage2 = cfg['in_channel']
         # self.FPN = FPN(in_channels_list, out_channels)
         self.FPN = FPN(in_channels_list, out_channels)
 ```
-<img src="https://img-blog.csdnimg.cn/20210610212941398.png" width="450" alt="stream"/><br/>
-
-以mobile0.25为例，从下往上的in_channels分别为64,128,256（在config.py定义的初始  `'in_channel': 32,`分别*2，*4，*8依次类推）
 
 我们在models/ghostnet.py中插入ghontnet网络，网络结构来源于诺亚方舟实验室开源地址[https://github.com/huawei-noah/ghostnet](https://github.com/huawei-noah/ghostnet)：
 
