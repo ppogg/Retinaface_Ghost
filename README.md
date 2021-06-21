@@ -1,31 +1,33 @@
+English |  [简体中文](https://github.com/pengtougu/Retinaface_Ghost/blob/master/README_CH.md)
+
 # RetinaFace in PyTorch
 
-### 中文详解博客：https://zhuanlan.zhihu.com/p/379730820
+### Chinese detailed blog：https://zhuanlan.zhihu.com/p/379730820
 
 <img src="https://pic1.zhimg.com/80/v2-84f20d3419063adf10bc001f8ae92a1c_720w.jpg" width="600" alt="stream"/><br/>
 
-## pytorch_retinaface版本跑库测试
+## Version Run Library Test of pytorch_retinaface
 
-retinaface效果如何，只能通过对比实验才能得到验证。这里对pytorch_retinaface版本进行测试，该版本是社区所有版本中star最高的一版。
+How well retinaface works can only be verified by comparison experiments. Here we test the pytorch_retinaface version, which is the one with the highest star among all versions in the community.
 
 #### 数据集准备
-该地址包含干净的Wideface数据集：[https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB](https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB)
+This address contains the clean Wideface dataset：[https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB](https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB)
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609195709924.png)
 
-下载后的数据集一共包含这三个：
+The downloaded dataset contains a total of these three.
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609200347763.png)
 
-此时的文件夹是只有图片的，然而作者要求的数据格式是：
+At this point the folder is image only, however the author requires the data in the format of:
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609200458806.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
 
-所以我们还少了数据的索引文件，这时候要使用作者提供的脚本`wider_val.py`，将图片信息导出成txt文件，导出后的完整格式如下：
+So we are still missing the index file for the data, and this is the time to use the script provided by the author`wider_val.py`. Export the image information to a txt file, the full format of the export is as follows.
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609200838123.png)
 
-每份数据集都有一份包含样本信息的txt文件，txt文件内容大致是这样（以train.txt为例），包含图片信息和人脸位置信息：
+Each dataset has a txt file containing the sample information. The content of the txt file is roughly like this (take train.txt as an example), containing image information and face location information.
 ```
 # 0--Parade/0_Parade_marchingband_1_849.jpg
 449 330 122 149 488.906 373.643 0.0 542.089 376.442 0.0 515.031 412.83 0.0 485.174 425.893 0.0 538.357 431.491 0.0 0.82
@@ -33,14 +35,14 @@ retinaface效果如何，只能通过对比实验才能得到验证。这里对p
 361 98 263 339 424.143 251.656 0.0 547.134 232.571 0.0 494.121 325.875 0.0 453.83 368.286 0.0 561.978 342.839 0.0 0.89
 ```
 
-#### 模型训练
+#### Model Training
 
 ```
 python train.py --network mobile0.25 
 ```
 如有需要，请先下载预训练模型，放在weights文件夹中。如果想从头开始训练，则在data/config.py文件中指定`'pretrain': False,`
 
-#### 模型评估
+#### Model Evaluation
 
 ```
 cd ./widerface_evaluate
@@ -49,16 +51,15 @@ python test_widerface.py --trained_model ./weights/mobilenet0.25_Final.pth --net
 python widerface_evaluate/evaluation.py
 ```
 
-## GhostNet和MobileNetv3移植骨架
+## GhostNet and MobileNetv3 migration backbone
 
-#### 3.1 pytorch_retinaface源码修改
+#### 3.1 pytorch_retinaface source code modification
 
-上节测试后，又拿了一张只包含一张人脸的图片进行检测，可以发现，resnet50对于检测单张图片且图片仅含单张人脸耗时比较久，如果项目注重实时性的话mb0.25是个更好的选择，但对于人脸密集且尺度较小的场景就显得比较吃力。
-倘若骨架替换成其他网络，是否能兼顾实时性和精度？
-这里的骨架替换暂时使用ghostnet和mobilev3网络（主要也想测试下这两个网络的效果是否能像论文一样出众）。
+After the test in the previous section, and took a picture containing only one face for detection, it can be found that resnet50 for the detection of a single picture and the picture contains only a single face takes longer, if the project focuses on real-time then mb0.25 is a better choice, but for the face dense and small-scale scenario is more strenuous.
+If the skeleton is replaced by another backbone, is it possible to balance real-time and accuracy?
+The backbone replacement here temporarily uses ghostnet and mobilev3 network (mainly also want to test whether the effect of these two networks can be as outstanding as the paper).
 
-我们在retinaface.py文件的父类指定相关引用，并在IntermediateLayerGetter(backbone, cfg['return_layers'])指定需要调用的网络层ID，该ID在config.py文件中已经指明：
-
+We specify the relevant reference in the parent class of the retinaface.py file，and specify the network layer ID to be called in IntermediateLayerGetter(backbone, cfg['return_layers']), which is specified in the config.py file as follows.
 ```
 def __init__(self, cfg=None, phase='train'):
     """
@@ -103,69 +104,71 @@ in_channels_stage2 = cfg['in_channel']
         self.FPN = FPN(in_channels_list, out_channels)
 ```
 
-我们在models/ghostnet.py中插入ghontnet网络，网络结构来源于诺亚方舟实验室开源地址[https://github.com/huawei-noah/ghostnet](https://github.com/huawei-noah/ghostnet)：
+We insert the ghontnet network in models/ghostnet.py, and the network structure comes from the Noah's Ark Labs open source address[https://github.com/huawei-noah/ghostnet](https://github.com/huawei-noah/ghostnet)：
 
-**轻量级网络分类效果对比：**
+**Lightweight network classification effect comparison：**
 
 <img src="https://img-blog.csdnimg.cn/20210610215038358.png" width="600" alt="stream"/><br/>
 
-因为包含残差卷积分离模块和SE模块，源码相对较长，修改后的网络源码如下：`models/ghostnet.py`
+Because of the inclusion of the residual convolution separation module and the SE module, the source code is relatively long, and the source code of the modified network is as follows`models/ghostnet.py`
 
-我们在models/mobilev3.py中插入MobileNetv3网络，网络结构来源于github网友复现的pytorch版本，真即插即用！[https://github.com/kuan-wang/pytorch-mobilenet-v3](https://github.com/kuan-wang/pytorch-mobilenet-v3)：
+We insert the MobileNetv3 network in models/mobilev3.py. The network structure comes from the pytorch version reproduced by github users, so it's really plug-and-play![https://github.com/kuan-wang/pytorch-mobilenet-v3](https://github.com/kuan-wang/pytorch-mobilenet-v3)：
 
-修改后的源码如下：`models/mobilenetv3.py`
+The modified source code is as follows.`models/mobilenetv3.py`
 
-#### 3.2 模型训练
+#### 3.2 Model Training
 
-执行命令：`python train.py --network ghostnet`开始训练
+Execute the command: `python train.py --network ghostnet` to start training
 
 <img src="https://img-blog.csdnimg.cn/20210610221938138.png" width="600" alt="stream"/><br/>
 
-统计每个网络训练单个epoch的时长：
+Counting the duration of training a single epoch per network.
 
  - **resnet50>>mobilenetv3>ghostnet-m>ghostnet-s>mobilenet0.25**
 
-#### 3.3 模型测试与评估
+#### 3.3 Model Testing and Evaluation
 
-**测试ghostnet（se-ratio=0.25）：**
+**Test GhostNet（se-ratio=0.25）：**
 
 ![](https://pic1.zhimg.com/80/v2-85514cc55ce31b937d4fdf85fbbf7670_720w.jpg)
 
-可以看出，一份batch的测试大概在56ms左右
+As you can see, a batch test is about 56ms
 
-**评估ghostnet(se-ratio=0.25）：**
+**Evaluation GhostNet(se-ratio=0.25）：**
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610222836784.png)
 
-可以看出，ghostnet对小样本数据和人脸遮挡的情况识别相对较差。
+It can be seen that ghostnet is relatively poor at recognizing small sample data and face occlusion.
 
-**测试MobileNetV3（se-ratio=1）：**
+**Test MobileNetV3（se-ratio=1）：**
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610223025905.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80NTgyOTQ2Mg==,size_16,color_FFFFFF,t_70)
 
 可以看出，一份batch的测试大概在120ms左右
 
-**评估MobileNetV3（se-ratio=1）：**
+**Evaluation MobileNetV3（se-ratio=1）：**
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210610223123787.png)
 
-这里的评估效果在三份子集上均优于ghostnet（这里的比对其实是有点不科学的，因为是用的mbv3的se_ratio全开对标ghostnet的se_ratio开1/4，但ghostnet的se_ratio全开会导致模型内存暴涨的情况（se-ratio=0时weights=6M，se-ratio=0.25时weights=12M，se-ratio=1时weights=30M，且精度勉强超过se-ratio=1的MobileNetV3，个人感觉性价比过低））
+The evaluation here outperforms ghostnet on all three subsets (the comparison here is actually a bit unscientific, because the full se_ratio of mbv3 is used to benchmark ghostnet's se_ratio by 1/4, but the full se_ratio of ghostnet will cause the model memory to skyrocket (at se-ratio=0) weights=6M, se-ratio=0.25 when weights=12M, se-ratio=1 when weights=30M, and the accuracy barely exceeds that of MobileNetV3 with se-ratio=1, I personally feel that the cost performance is too low)
 
-#### 3.4 模型检测
+Translated with www.DeepL.com/Translator (free version)
 
- - 调用webcam：
+#### 3.4 Model Demo
+
+ - Use webcam：
 
     python detect.py -fourcc 0
 
- - 检测图片：
+ - Detect Face：
  
 
     python detect.py --image img_path
 
- - 检测图片并保存结果：
+ - Detect Face and save：
 
     python detect.py --image img_path --sava_image True
 
-#### 3.2 resnet & mbv3 & gnet & mb0.25对比测试
-   **推理性能对比：**
+#### 3.2 comparision of resnet & mbv3 & gnet & mb0.25 
+   **Reasoning Performance Comparison：**
    
 Backbone | Computing backend | size（MB） | Framework | input_size| Run time
  :-----:|:-----:|:-----:|:----------:|:----:|:----:|
@@ -175,7 +178,7 @@ MobileNet v3| Core i5-4210M | 8 | torch| 640| 576 ms
 MobileNet0.25| Core i5-4210M | 1.7| torch| 640| 187 ms
 MobileNet0.25| Core i5-4210M | 1.7 | onnxruntime| 640| 73 ms
 
-   **检测性能对比：**
+   **Testing performance comparison：**
 Backbone | Easy | Medium | Hard
  :-----:|:-----:|:-----:|:----------:|
 resnet50| 95.48% |94.04% | 84.43%| 
@@ -183,11 +186,11 @@ $MobileNet v3^{Se=1}$| 93.48%| 91.23% | 80.19%|
 $GhostNet-m^{Se=0.25}$| 93.35% |90.84% | 76.11%|
 MobileNet0.25| 90.70% | 88.16%| 73.82%| 
 
-   **单图测试效果对比：**
+   **Comparison of the effect of single chart test：**
 
 <img src="https://pic1.zhimg.com/80/v2-84f20d3419063adf10bc001f8ae92a1c_720w.jpg" width="600" alt="stream"/><br/>
 
-### 中文详解博客：https://zhuanlan.zhihu.com/p/379730820
+### Chinese detailed blog：https://zhuanlan.zhihu.com/p/379730820
 
 ## References
 - [FaceBoxes](https://github.com/zisianw/FaceBoxes.PyTorch)
