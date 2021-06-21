@@ -10,7 +10,7 @@ English |  [简体中文](https://github.com/pengtougu/Retinaface_Ghost/blob/mas
 
 How well retinaface works can only be verified by comparison experiments. Here we test the pytorch_retinaface version, which is the one with the highest star among all versions in the community.
 
-#### 数据集准备
+#### Data set preparation
 This address contains the clean Wideface dataset：[https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB](https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB)
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210609195709924.png)
@@ -40,7 +40,7 @@ Each dataset has a txt file containing the sample information. The content of th
 ```
 python train.py --network mobile0.25 
 ```
-如有需要，请先下载预训练模型，放在weights文件夹中。如果想从头开始训练，则在data/config.py文件中指定`'pretrain': False,`
+If necessary, please download the pre-trained model first and put it in the weights folder. If you want to start training from scratch, specify `'pretrain': False,` in the data/config.py file.
 
 #### Model Evaluation
 
@@ -90,7 +90,7 @@ def __init__(self, cfg=None, phase='train'):
 
     self.body = _utils.IntermediateLayerGetter(backbone, cfg['return_layers'])
 ```
-我们指定FPN的网络通道数，并为模型中制定的三层FPN结构固定每一层的`in_channels`：
+We specify the number of network channels of the FPN and fix the `in_channels` of each layer for the three-layer FPN structure formulated in the model.
 
 ```
 in_channels_stage2 = cfg['in_channel']
