@@ -197,8 +197,3 @@ MobileNet0.25| 90.70% | 88.16%| 73.82%|
 - [Retinaface (mxnet)](https://github.com/deepinsight/insightface/tree/master/RetinaFace)
 - [biubug6/Pytorch_Retinaface](https://github.com/biubug6/Pytorch_Retinaface)
 ```
-@inproceedings{deng2019retinaface,
-title={RetinaFace: Single-stage Dense Face Localisation in the Wild},
-author={Deng, Jiankang and Guo, Jia and Yuxiang, Zhou and Jinke Yu and Irene Kotsia and Zafeiriou, Stefanos},
-booktitle={arxiv},
-year={2019}
