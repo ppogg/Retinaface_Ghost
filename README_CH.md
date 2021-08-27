@@ -4,6 +4,10 @@
 
 <img src="https://pic1.zhimg.com/80/v2-84f20d3419063adf10bc001f8ae92a1c_720w.jpg" width="600" alt="stream"/><br/>
 
+### 戴口罩的人脸识别依旧很鲁棒-----------------------------------
+
+<img src="https://user-images.githubusercontent.com/82716366/131131401-0b513a62-58be-4ffb-8f37-d416136203d0.png" width="600" alt="stream"/><br/>
+
 ## pytorch_retinaface版本跑库测试
 
 retinaface效果如何，只能通过对比实验才能得到验证。这里对pytorch_retinaface版本进行测试，该版本是社区所有版本中star最高的一版。
