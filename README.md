@@ -6,9 +6,9 @@ English |  [简体中文](https://github.com/pengtougu/Retinaface_Ghost/blob/mas
 
 <img src="https://pic1.zhimg.com/80/v2-84f20d3419063adf10bc001f8ae92a1c_720w.jpg" width="600" alt="stream"/><br/>
 
-### Face recognition with masks is still robust
+### Face recognition with masks is still robust----------------------------------------------------------------------------------
 
-![image](https://user-images.githubusercontent.com/82716366/131131401-0b513a62-58be-4ffb-8f37-d416136203d0.png)
+<img src="https://user-images.githubusercontent.com/82716366/131131401-0b513a62-58be-4ffb-8f37-d416136203d0.png" width="600" alt="stream"/><br/>
 
 ## Version Run Library Test of pytorch_retinaface
 
