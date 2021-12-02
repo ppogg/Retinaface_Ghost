@@ -8,8 +8,6 @@ English |  [简体中文](https://github.com/pengtougu/Retinaface_Ghost/blob/mas
 
 ### Face recognition with masks is still robust-----------------------------------
 
-<img src="https://user-images.githubusercontent.com/82716366/131131401-0b513a62-58be-4ffb-8f37-d416136203d0.png" width="600" alt="stream"/><br/>
-
 ## Version Run Library Test of pytorch_retinaface
 
 How well retinaface works can only be verified by comparison experiments. Here we test the pytorch_retinaface version, which is the one with the highest star among all versions in the community.
